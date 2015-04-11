@@ -1,16 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
 namespace RedPencil
 {
-    public class Product
+    public class Product : INotifyPropertyChanged
     {
+        private double salePrice;
+        
         public double MSRP { get; set; }
 
-        public double SalePrice { get; set; }
+        public double SalePrice 
+        {
+            get { return salePrice; }
+            set 
+            {
+                if (salePrice != value)
+                {
+                    salePrice = value;
+                    if (PropertyChanged != null)
+                        PropertyChanged(this, new PropertyChangedEventArgs("SalePrice"));
+                }
+            }
+        }
 
         public DateTime PreviousPriceChangeOccurredAt { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

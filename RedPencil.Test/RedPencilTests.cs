@@ -101,5 +101,21 @@ namespace RedPencil.Test
 
             Assert.AreEqual(promotionLength, promotion.EndDate - promotion.StartDate);
         }
+
+        [TestMethod]
+        public void PriceIncreaseDuringPromotionEndsIt()
+        {
+            Product product = new Product();
+            product.MSRP = 1;
+            product.SalePrice = .9;
+            product.PreviousPriceChangeOccurredAt = DateTime.Now.Subtract(TimeSpan.FromDays(30));
+
+            RedPencil promotion = new RedPencil();
+            var promotionEnd = promotion.EndDate;
+            promotion.Begin(product);
+            product.SalePrice = .95;
+
+            Assert.AreNotEqual(promotionEnd, promotion.EndDate);
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +23,23 @@ namespace RedPencil
         {
             if (!IsEligible(product) || (EndDate - StartDate).Days > 30)
                 throw new InvalidOperationException();
+
+            SalePrice = product.SalePrice;
+            product.PropertyChanged += OnProductPropertyChanged;
         }
+
+        private void OnProductPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "SalePrice")
+            {
+                var product = (Product)sender;
+                if (SalePrice < product.SalePrice)
+                {
+                    EndDate = DateTime.Now;
+                }
+            }
+        }
+
+        public double SalePrice { get; set; }
     }
 }
