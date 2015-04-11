@@ -137,5 +137,20 @@ namespace RedPencil.Test
             var anotherPromotion = new RedPencil();
             anotherPromotion.Begin(product);            
         }
+
+        [TestMethod]
+        public void AnotherPromotionMayBeStartedIfTheyDoNotOverlap()
+        {
+            var product = CreateTestProduct();
+            var promotion = new RedPencil();
+            promotion.StartDate = DateTime.Now.Subtract(TimeSpan.FromDays(1));
+            promotion.EndDate = DateTime.Now;
+            promotion.Begin(product);
+
+            var anotherPromotion = new RedPencil();
+            promotion.StartDate = DateTime.Now;
+            promotion.EndDate = DateTime.Now.AddDays(1);
+            anotherPromotion.Begin(product); 
+        }
     }
 }
