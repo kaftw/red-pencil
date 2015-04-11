@@ -73,5 +73,17 @@ namespace RedPencil.Test
 
             promotion.Begin(new Product());
         }
+
+        [TestMethod]
+        public void PromotionCanLastUpTo30Days()
+        {
+            Product product = new Product();
+            product.MSRP = 1;
+            product.SalePrice = .9;
+            product.PreviousPriceChangeOccurredAt = DateTime.Now.Subtract(TimeSpan.FromDays(30));
+            
+            RedPencil promotion = new RedPencil();
+            promotion.Begin(product);
+        }
     }
 }

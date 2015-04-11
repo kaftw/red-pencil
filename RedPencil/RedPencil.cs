@@ -20,7 +20,8 @@ namespace RedPencil
 
         public void Begin(Product product)
         {
-            throw new InvalidOperationException();
+            if (!IsEligible(product) || (EndDate - StartDate).Days > 30)
+                throw new InvalidOperationException();
         }
     }
 }
