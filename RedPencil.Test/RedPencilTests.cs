@@ -148,8 +148,21 @@ namespace RedPencil.Test
             promotion.Begin(product);
 
             var anotherPromotion = new RedPencil();
-            promotion.StartDate = DateTime.Now;
-            promotion.EndDate = DateTime.Now.AddDays(1);
+            anotherPromotion.StartDate = DateTime.Now;
+            anotherPromotion.EndDate = DateTime.Now.AddDays(1);
+            anotherPromotion.Begin(product); 
+        }
+
+        [ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod]
+        public void AnotherPromotionMayNotBeStartedIfTheyDoOverlap()
+        {
+            var product = CreateTestProduct();
+            var factory = new RedPencilFactory();
+            var promotion = factory.CreatePromotion(product, DateTime.Now.Subtract(TimeSpan.FromDays(1)), DateTime.Now);
+            promotion.Begin(product);
+
+            var anotherPromotion = factory.CreatePromotion(product, DateTime.Now.Subtract(TimeSpan.FromHours(12)), DateTime.Now.AddDays(1));
             anotherPromotion.Begin(product); 
         }
     }

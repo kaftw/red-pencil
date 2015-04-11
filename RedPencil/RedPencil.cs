@@ -41,5 +41,10 @@ namespace RedPencil
         }
 
         public double SalePrice { get; set; }
+
+        internal bool Intersects(DateTime startDate, DateTime endDate)
+        {
+            return (StartDate >= startDate && StartDate <= endDate) || (EndDate >= startDate && EndDate <= endDate);
+        }
     }
 }
