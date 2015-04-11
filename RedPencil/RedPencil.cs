@@ -33,7 +33,7 @@ namespace RedPencil
             if (e.PropertyName == "SalePrice")
             {
                 var product = (Product)sender;
-                if (SalePrice < product.SalePrice)
+                if (SalePrice < product.SalePrice || (product.MSRP - product.SalePrice) / product.MSRP > .3)
                 {
                     EndDate = DateTime.Now;
                 }

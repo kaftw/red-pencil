@@ -42,21 +42,25 @@ namespace RedPencil.Test
         [TestMethod]
         public void PromotionTakesEffectIfPriceHasNotChangedFor30Days()
         {
-            Product product = new Product();
-            product.MSRP = 1;
-            product.SalePrice = .9;
-            product.PreviousPriceChangeOccurredAt = DateTime.Now.Subtract(TimeSpan.FromDays(30));
+            Product product = CreateTestProduct();
 
             RedPencil promotion = new RedPencil();
             Assert.AreEqual(true, promotion.IsEligible(product));
         }
 
-        [TestMethod]
-        public void PromotionDoesNotTakeEffectWithin30DaysOfPreviousPriceChange()
+        private static Product CreateTestProduct()
         {
             Product product = new Product();
             product.MSRP = 1;
             product.SalePrice = .9;
+            product.PreviousPriceChangeOccurredAt = DateTime.Now.Subtract(TimeSpan.FromDays(30));
+            return product;
+        }
+
+        [TestMethod]
+        public void PromotionDoesNotTakeEffectWithin30DaysOfPreviousPriceChange()
+        {
+            Product product = CreateTestProduct();
             product.PreviousPriceChangeOccurredAt = DateTime.Now;
 
             RedPencil promotion = new RedPencil();
@@ -77,10 +81,7 @@ namespace RedPencil.Test
         [TestMethod]
         public void PromotionCanLastUpTo30Days()
         {
-            Product product = new Product();
-            product.MSRP = 1;
-            product.SalePrice = .9;
-            product.PreviousPriceChangeOccurredAt = DateTime.Now.Subtract(TimeSpan.FromDays(30));
+            Product product = CreateTestProduct();
             
             RedPencil promotion = new RedPencil();
             promotion.Begin(product);
@@ -89,10 +90,7 @@ namespace RedPencil.Test
         [TestMethod]
         public void PriceReductionDuringPromotionDoesNotProlongIt()
         {
-            Product product = new Product();
-            product.MSRP = 1;
-            product.SalePrice = .9;
-            product.PreviousPriceChangeOccurredAt = DateTime.Now.Subtract(TimeSpan.FromDays(30));
+            Product product = CreateTestProduct();
 
             RedPencil promotion = new RedPencil();
             var promotionLength = promotion.EndDate - promotion.StartDate;
@@ -105,15 +103,25 @@ namespace RedPencil.Test
         [TestMethod]
         public void PriceIncreaseDuringPromotionEndsIt()
         {
-            Product product = new Product();
-            product.MSRP = 1;
-            product.SalePrice = .9;
-            product.PreviousPriceChangeOccurredAt = DateTime.Now.Subtract(TimeSpan.FromDays(30));
+            Product product = CreateTestProduct();
 
             RedPencil promotion = new RedPencil();
             var promotionEnd = promotion.EndDate;
             promotion.Begin(product);
             product.SalePrice = .95;
+
+            Assert.AreNotEqual(promotionEnd, promotion.EndDate);
+        }
+
+        [TestMethod]
+        public void PriceReductionToTotalDiscountGreaterThan30PercentEndsPromotion()
+        {
+            Product product = CreateTestProduct();
+
+            RedPencil promotion = new RedPencil();
+            var promotionEnd = promotion.EndDate;
+            promotion.Begin(product);
+            product.SalePrice = .6;
 
             Assert.AreNotEqual(promotionEnd, promotion.EndDate);
         }
