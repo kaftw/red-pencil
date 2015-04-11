@@ -16,5 +16,16 @@ namespace RedPencil.Test
             RedPencil promotion = new RedPencil();
             Assert.AreEqual(true, promotion.IsEligible(product));
         }
+
+        [TestMethod]
+        public void RedPencilPromotionDoesNotTakeEffectOver30PercentDiscount()
+        {
+            Product product = new Product();
+            product.MSRP = 1;
+            product.SalePrice = .65;
+
+            RedPencil promotion = new RedPencil();
+            Assert.AreEqual(false, promotion.IsEligible(product));
+        }
     }
 }

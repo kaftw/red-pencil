@@ -10,7 +10,8 @@ namespace RedPencil
     {
         public Boolean IsEligible(Product product)
         {
-            return true;
+            var percentageDiscount = (product.MSRP - product.SalePrice) / product.MSRP;
+            return percentageDiscount <= .3;
         }
     }
 }
