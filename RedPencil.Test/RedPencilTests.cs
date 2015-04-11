@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace RedPencil.Test
 {
@@ -13,8 +13,7 @@ namespace RedPencil.Test
             product.MSRP = 1.0d;
             product.SalePrice = 0.95d;
 
-            var promotion = new RedPencil();
-            Assert.AreEqual(true, promotion.IsEligible(product));
+            Assert.AreEqual(true, RedPencil.IsEligible(product));
         }
 
         [TestMethod]
@@ -24,8 +23,7 @@ namespace RedPencil.Test
             product.MSRP = 1;
             product.SalePrice = .65;
 
-            var promotion = new RedPencil();
-            Assert.AreEqual(false, promotion.IsEligible(product));
+            Assert.AreEqual(false, RedPencil.IsEligible(product));
         }
 
         [TestMethod]
@@ -35,8 +33,7 @@ namespace RedPencil.Test
             product.MSRP = 1;
             product.SalePrice = .96;
 
-            var promotion = new RedPencil();
-            Assert.AreEqual(false, promotion.IsEligible(product));
+            Assert.AreEqual(false, RedPencil.IsEligible(product));
         }
 
         [TestMethod]
@@ -44,8 +41,7 @@ namespace RedPencil.Test
         {
             var product = CreateTestProduct();
 
-            var promotion = new RedPencil();
-            Assert.AreEqual(true, promotion.IsEligible(product));
+            Assert.AreEqual(true, RedPencil.IsEligible(product));
         }
 
         private static Product CreateTestProduct()
@@ -63,27 +59,26 @@ namespace RedPencil.Test
             var product = CreateTestProduct();
             product.PreviousPriceChangeOccurredAt = DateTime.Now;
 
-            var promotion = new RedPencil();
-            Assert.AreEqual(false, promotion.IsEligible(product));
+            Assert.AreEqual(false, RedPencil.IsEligible(product));
         }
 
         [ExpectedException(typeof(InvalidOperationException))]
         [TestMethod]
         public void PromotionCanNotLastMoreThan30Days()
         {
-            var promotion = new RedPencil();
-            promotion.StartDate = DateTime.Now.Subtract(TimeSpan.FromDays(31));
-            promotion.EndDate = DateTime.Now;
+            var product = new Product();
+            var factory = new RedPencilFactory();
+            var promotion = factory.CreatePromotion(product, DateTime.Now.Subtract(TimeSpan.FromDays(31)), DateTime.Now);
 
-            promotion.Begin(new Product());
+            promotion.Begin(product);
         }
 
         [TestMethod]
         public void PromotionCanLastUpTo30Days()
         {
             var product = CreateTestProduct();
-
-            var promotion = new RedPencil();
+            var factory = new RedPencilFactory();
+            var promotion = factory.CreatePromotion(product, DateTime.Now, DateTime.Now.AddDays(30));
             promotion.Begin(product);
         }
 
@@ -92,7 +87,8 @@ namespace RedPencil.Test
         {
             var product = CreateTestProduct();
 
-            var promotion = new RedPencil();
+            var factory = new RedPencilFactory();
+            var promotion = factory.CreatePromotion(product, DateTime.Now, DateTime.Now.AddDays(30));
             var promotionLength = promotion.EndDate - promotion.StartDate;
             promotion.Begin(product);
             product.SalePrice = .8;
@@ -105,7 +101,8 @@ namespace RedPencil.Test
         {
             var product = CreateTestProduct();
 
-            var promotion = new RedPencil();
+            var factory = new RedPencilFactory();
+            var promotion = factory.CreatePromotion(product, DateTime.Now, DateTime.Now.AddDays(30));
             var promotionEnd = promotion.EndDate;
             promotion.Begin(product);
             product.SalePrice = .95;
@@ -118,7 +115,8 @@ namespace RedPencil.Test
         {
             var product = CreateTestProduct();
 
-            var promotion = new RedPencil();
+            var factory = new RedPencilFactory();
+            var promotion = factory.CreatePromotion(product, DateTime.Now, DateTime.Now.AddDays(30));
             var promotionEnd = promotion.EndDate;
             promotion.Begin(product);
             product.SalePrice = .6;
@@ -127,29 +125,14 @@ namespace RedPencil.Test
         }
 
         [TestMethod]
-        public void AnotherPromotionMayBeStartedAfterOneEndsAsLongAsProductIsEligible()
-        {
-            var product = CreateTestProduct();
-            var promotion = new RedPencil();
-            promotion.Begin(product);
-            promotion.EndDate = DateTime.Now;
-
-            var anotherPromotion = new RedPencil();
-            anotherPromotion.Begin(product);            
-        }
-
-        [TestMethod]
         public void AnotherPromotionMayBeStartedIfTheyDoNotOverlap()
         {
             var product = CreateTestProduct();
-            var promotion = new RedPencil();
-            promotion.StartDate = DateTime.Now.Subtract(TimeSpan.FromDays(1));
-            promotion.EndDate = DateTime.Now;
+            var factory = new RedPencilFactory();
+            var promotion = factory.CreatePromotion(product, DateTime.Now.Subtract(TimeSpan.FromDays(1)), DateTime.Now);
             promotion.Begin(product);
 
-            var anotherPromotion = new RedPencil();
-            anotherPromotion.StartDate = DateTime.Now;
-            anotherPromotion.EndDate = DateTime.Now.AddDays(1);
+            var anotherPromotion = factory.CreatePromotion(product, DateTime.Now.AddMilliseconds(1), DateTime.Now.AddDays(1));
             anotherPromotion.Begin(product); 
         }
 
