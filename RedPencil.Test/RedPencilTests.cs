@@ -85,5 +85,21 @@ namespace RedPencil.Test
             RedPencil promotion = new RedPencil();
             promotion.Begin(product);
         }
+
+        [TestMethod]
+        public void PriceReductionDuringPromotionDoesNotProlongIt()
+        {
+            Product product = new Product();
+            product.MSRP = 1;
+            product.SalePrice = .9;
+            product.PreviousPriceChangeOccurredAt = DateTime.Now.Subtract(TimeSpan.FromDays(30));
+
+            RedPencil promotion = new RedPencil();
+            var promotionLength = promotion.EndDate - promotion.StartDate;
+            promotion.Begin(product);
+            product.SalePrice = .8;
+
+            Assert.AreEqual(promotionLength, promotion.EndDate - promotion.StartDate);
+        }
     }
 }
