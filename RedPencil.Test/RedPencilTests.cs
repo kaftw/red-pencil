@@ -38,5 +38,17 @@ namespace RedPencil.Test
             RedPencil promotion = new RedPencil();
             Assert.AreEqual(false, promotion.IsEligible(product));
         }
+
+        [TestMethod]
+        public void RedPencilPromotionTakesEffectIfPriceHasNotChangedFor30Days()
+        {
+            Product product = new Product();
+            product.MSRP = 1;
+            product.SalePrice = .9;
+            product.PreviousPriceChangeOccurredAt = DateTime.Now.Subtract(TimeSpan.FromDays(31));
+
+            RedPencil promotion = new RedPencil();
+            Assert.AreEqual(true, promotion.IsEligible(product));
+        }
     }
 }
