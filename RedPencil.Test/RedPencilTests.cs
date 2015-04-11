@@ -7,7 +7,7 @@ namespace RedPencil.Test
     public class RedPencilTests
     {
         [TestMethod]
-        public void RedPencilPromotionTakesEffectAt5PercentDiscount()
+        public void PromotionTakesEffectAt5PercentDiscount()
         {
             Product product = new Product();
             product.MSRP = 1.0d;
@@ -18,7 +18,7 @@ namespace RedPencil.Test
         }
 
         [TestMethod]
-        public void RedPencilPromotionDoesNotTakeEffectOver30PercentDiscount()
+        public void PromotionDoesNotTakeEffectOver30PercentDiscount()
         {
             Product product = new Product();
             product.MSRP = 1;
@@ -29,7 +29,7 @@ namespace RedPencil.Test
         }
 
         [TestMethod]
-        public void RedPencilPromotionDoesNotEffectBelow5PercentDiscount()
+        public void PromotionDoesNotEffectBelow5PercentDiscount()
         {
             Product product = new Product();
             product.MSRP = 1;
@@ -40,15 +40,38 @@ namespace RedPencil.Test
         }
 
         [TestMethod]
-        public void RedPencilPromotionTakesEffectIfPriceHasNotChangedFor30Days()
+        public void PromotionTakesEffectIfPriceHasNotChangedFor30Days()
         {
             Product product = new Product();
             product.MSRP = 1;
             product.SalePrice = .9;
-            product.PreviousPriceChangeOccurredAt = DateTime.Now.Subtract(TimeSpan.FromDays(31));
+            product.PreviousPriceChangeOccurredAt = DateTime.Now.Subtract(TimeSpan.FromDays(30));
 
             RedPencil promotion = new RedPencil();
             Assert.AreEqual(true, promotion.IsEligible(product));
+        }
+
+        [TestMethod]
+        public void PromotionDoesNotTakeEffectWithin30DaysOfPreviousPriceChange()
+        {
+            Product product = new Product();
+            product.MSRP = 1;
+            product.SalePrice = .9;
+            product.PreviousPriceChangeOccurredAt = DateTime.Now;
+
+            RedPencil promotion = new RedPencil();
+            Assert.AreEqual(false, promotion.IsEligible(product));
+        }
+
+        [ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod]
+        public void PromotionCanNotLastMoreThan30Days()
+        {
+            RedPencil promotion = new RedPencil();
+            promotion.StartDate = DateTime.Now.Subtract(TimeSpan.FromDays(31));
+            promotion.EndDate = DateTime.Now;
+
+            promotion.Begin(new Product());
         }
     }
 }

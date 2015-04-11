@@ -13,5 +13,14 @@ namespace RedPencil
             var percentageDiscount = (product.MSRP - product.SalePrice) / product.MSRP;
             return percentageDiscount >= .05 && percentageDiscount <= .3 && DateTime.Now.Subtract(product.PreviousPriceChangeOccurredAt).Days >= 30;
         }
+
+        public DateTime StartDate { get; set; }
+
+        public DateTime EndDate { get; set; }
+
+        public void Begin(Product product)
+        {
+            throw new InvalidOperationException();
+        }
     }
 }
