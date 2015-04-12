@@ -9,15 +9,17 @@ namespace RedPencil
         {
         }
 
+        public DateTime StartDate { get; set; }
+
+        public DateTime EndDate { get; set; }
+
+        public double SalePrice { get; set; }
+
         public static Boolean IsEligible(Product product)
         {
             var percentageDiscount = (product.MSRP - product.SalePrice) / product.MSRP;
             return percentageDiscount >= .05 && percentageDiscount <= .3 && DateTime.Now.Subtract(product.PreviousPriceChangeOccurredAt).Days >= 30;
         }
-
-        public DateTime StartDate { get; set; }
-
-        public DateTime EndDate { get; set; }
 
         public void Begin(Product product)
         {
@@ -26,6 +28,11 @@ namespace RedPencil
 
             SalePrice = product.SalePrice;
             product.PropertyChanged += OnProductPropertyChanged;
+        }
+
+        internal bool Intersects(DateTime startDate, DateTime endDate)
+        {
+            return (StartDate >= startDate && StartDate <= endDate) || (EndDate >= startDate && EndDate <= endDate);
         }
 
         private void OnProductPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -38,13 +45,6 @@ namespace RedPencil
                     EndDate = DateTime.Now;
                 }
             }
-        }
-
-        public double SalePrice { get; set; }
-
-        internal bool Intersects(DateTime startDate, DateTime endDate)
-        {
-            return (StartDate >= startDate && StartDate <= endDate) || (EndDate >= startDate && EndDate <= endDate);
         }
     }
 }
