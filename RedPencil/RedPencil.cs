@@ -9,11 +9,11 @@ namespace RedPencil
         {
         }
 
-        public DateTime StartDate { get; set; }
+        public DateTime StartDate { get; internal set; }
 
-        public DateTime EndDate { get; set; }
+        public DateTime EndDate { get; internal set; }
 
-        public double SalePrice { get; set; }
+        public double SalePrice { get; private set; }
 
         public static Boolean IsEligible(Product product)
         {
@@ -23,7 +23,7 @@ namespace RedPencil
 
         public void Begin(Product product)
         {
-            if (!IsEligible(product) || (EndDate - StartDate).Days > 30)
+            if (!IsEligible(product))
                 throw new InvalidOperationException();
 
             SalePrice = product.SalePrice;

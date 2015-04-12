@@ -53,6 +53,20 @@ namespace RedPencil.Test
             Assert.AreEqual(false, RedPencil.IsEligible(product));
         }        
 
+        [TestMethod]
+        public void PriceReductionToTotalDiscountGreaterThan30PercentEndsPromotion()
+        {
+            var product = CreateTestProduct();
+
+            var factory = new RedPencilFactory();
+            var promotion = factory.CreatePromotion(product, DateTime.Now, DateTime.Now.AddDays(30));
+            var promotionEnd = promotion.EndDate;
+            promotion.Begin(product);
+            product.SalePrice = .6;
+
+            Assert.AreNotEqual(promotionEnd, promotion.EndDate);
+        }
+
         private static Product CreateTestProduct()
         {
             var product = new Product();

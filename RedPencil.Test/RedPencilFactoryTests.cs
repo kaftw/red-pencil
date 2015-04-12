@@ -13,8 +13,6 @@ namespace RedPencil.Test
             var product = CreateTestProduct();
             var factory = new RedPencilFactory();
             var promotion = factory.CreatePromotion(product, DateTime.Now.Subtract(TimeSpan.FromDays(31)), DateTime.Now);
-
-            promotion.Begin(product);
         }
 
         [TestMethod]
@@ -23,7 +21,8 @@ namespace RedPencil.Test
             var product = CreateTestProduct();
             var factory = new RedPencilFactory();
             var promotion = factory.CreatePromotion(product, DateTime.Now, DateTime.Now.AddDays(30));
-            promotion.Begin(product);
+
+            Assert.AreEqual(30, (promotion.EndDate - promotion.StartDate).Days);
         }
 
         [TestMethod]
@@ -55,29 +54,13 @@ namespace RedPencil.Test
         }
 
         [TestMethod]
-        public void PriceReductionToTotalDiscountGreaterThan30PercentEndsPromotion()
-        {
-            var product = CreateTestProduct();
-
-            var factory = new RedPencilFactory();
-            var promotion = factory.CreatePromotion(product, DateTime.Now, DateTime.Now.AddDays(30));
-            var promotionEnd = promotion.EndDate;
-            promotion.Begin(product);
-            product.SalePrice = .6;
-
-            Assert.AreNotEqual(promotionEnd, promotion.EndDate);
-        }
-
-        [TestMethod]
         public void AnotherPromotionMayBeStartedIfTheyDoNotOverlap()
         {
             var product = CreateTestProduct();
             var factory = new RedPencilFactory();
             var promotion = factory.CreatePromotion(product, DateTime.Now.Subtract(TimeSpan.FromDays(1)), DateTime.Now);
-            promotion.Begin(product);
 
             var anotherPromotion = factory.CreatePromotion(product, DateTime.Now.AddMilliseconds(1), DateTime.Now.AddDays(1));
-            anotherPromotion.Begin(product);
         }
 
         [ExpectedException(typeof(InvalidOperationException))]
@@ -87,10 +70,8 @@ namespace RedPencil.Test
             var product = CreateTestProduct();
             var factory = new RedPencilFactory();
             var promotion = factory.CreatePromotion(product, DateTime.Now.Subtract(TimeSpan.FromDays(1)), DateTime.Now);
-            promotion.Begin(product);
 
             var anotherPromotion = factory.CreatePromotion(product, DateTime.Now.Subtract(TimeSpan.FromHours(12)), DateTime.Now.AddDays(1));
-            anotherPromotion.Begin(product);
         }
 
         private static Product CreateTestProduct()

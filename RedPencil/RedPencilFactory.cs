@@ -10,6 +10,9 @@ namespace RedPencil
 
         public RedPencil CreatePromotion(Product product, DateTime startDate, DateTime endDate)
         {
+            if (endDate - startDate > TimeSpan.FromDays(30))
+                throw new InvalidOperationException();
+            
             List<RedPencil> promotions;
             
             if (!promotionsDictionary.ContainsKey(product))
