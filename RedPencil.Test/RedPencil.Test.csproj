@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="RedPencilTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RedPencilFactoryTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RedPencil\RedPencil.csproj">
